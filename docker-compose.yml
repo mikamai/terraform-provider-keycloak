@@ -1,0 +1,37 @@
+version: "3"
+volumes:
+  postgres:
+services:
+  postgres:
+    environment:
+    - POSTGRES_DB=keycloak
+    - POSTGRES_USER=keycloak
+    - POSTGRES_PASSWORD=password
+    image: postgres:9.6
+    ports:
+    - 5432:5432
+    volumes:
+    - postgres:/var/lib/postgresql
+  openldap:
+    image: osixia/openldap:1.2.2
+    ports:
+    - 8389:389
+  keycloak:
+    image: jboss/keycloak:4.8.3.Final
+    depends_on:
+    - postgres
+    - openldap
+    environment:
+    - DB_VENDOR=POSTGRES
+    - KEYCLOAK_LOGLEVEL=DEBUG
+    - POSTGRES_USER=keycloak
+    - POSTGRES_DATABASE=keycloak
+    - POSTGRES_PASSWORD=password
+    - KEYCLOAK_USER=keycloak
+    - KEYCLOAK_PASSWORD=password
+    - POSTGRES_PORT_5432_TCP_ADDR=postgres
+    - POSTGRES_PORT_5432_TCP_PORT=5432
+    ports:
+    - 8080:8080
+    volumes:
+    - ./custom-user-federation-example/build/libs:/opt/jboss/keycloak/providers/
