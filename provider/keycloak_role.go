@@ -7,7 +7,7 @@ import (
 
 func resourceKeycloakRole() *schema.Resource {
 	return &schema.Resource{
-		//Create: resourceKeycloakGroupCreate,
+		Create: resourceKeycloakRoleCreate,
 		Read:   resourceKeycloakRoleRead,
 		Delete: resourceKeycloakRoleDelete,
 		Update: resourceKeycloakRoleUpdate,
@@ -43,6 +43,17 @@ func mapFromRoleToData(data *schema.ResourceData, role *keycloak.Role) {
 
 	data.Set("realm_id", role.RealmId)
 	data.Set("name", role.Name)
+}
+
+func resourceKeycloakRoleCreate(data *schema.ResourceData, meta interface{}) error {
+	keycloakClient := meta.(*keycloak.KeycloakClient)
+	role := mapFromDataToRole(data)
+	err := keycloakClient.NewRole(role)
+	if err != nil {
+		return err
+	}
+	mapFromRoleToData(data, role)
+	return resourceKeycloakRoleRead(data, meta)
 }
 
 func resourceKeycloakRoleRead(data *schema.ResourceData, meta interface{}) error {

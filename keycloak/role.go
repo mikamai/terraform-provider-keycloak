@@ -10,25 +10,16 @@ type Role struct {
 	Name    string `json:"name"`
 }
 
-/*
-func (keycloakClient *KeycloakClient) NewRole(group *Group) error {
-	var createGroupUrl string
-
-	if group.ParentId == "" {
-		createGroupUrl = fmt.Sprintf("/realms/%s/groups", group.RealmId)
-	} else {
-		createGroupUrl = fmt.Sprintf("/realms/%s/groups/%s/children", group.RealmId, group.ParentId)
-	}
-
-	location, err := keycloakClient.post(createGroupUrl, group)
+func (keycloakClient *KeycloakClient) NewRole(role *Role) error {
+	var createRoleUrl string
+	createRoleUrl = fmt.Sprintf("/%s/clients/%s/roles", role.Name, role.Id)
+	location, err := keycloakClient.post(createRoleUrl, role)
 	if err != nil {
 		return err
 	}
-
-	group.Id = getIdFromLocationHeader(location)
-
+	role.Id = getIdFromLocationHeader(location)
 	return nil
-}*/
+}
 
 func (keycloakClient *KeycloakClient) GetRole(realmId, id, roleName string) (*Role, error) {
 	var role Role
